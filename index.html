@@ -1,0 +1,305 @@
+<!--YOUR GitHub!-->
+<!--Web programming MidTerm project-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> YOUR GitHub! </title>
+        <meta charset="utf-8">
+    </head>
+<!-- create tables to show user data(left table), input and submit button(right table)-->
+    <body>
+        <table class="main">
+            <tr>
+                <td>
+                    <!-- left table: User data -->
+                    <table class="info">
+                        <tr>
+                            <!-- profile image -->
+                             <td><img id="profileImage" src="GitHub-Mark.png"></td>
+                             <td>
+                                <table>
+                                    <tr>
+                                        <!-- profile Name -->
+                                        <td id="profileName"></td>
+                                    </tr>
+                                    <tr>
+                                        <!-- Blog -->
+                                        <td id="profileBlog"></td>
+                                    </tr>
+                                    <tr>
+                                        <!-- Location -->
+                                        <td id="profileLocation"></td>
+                                    </tr>
+                                    <tr>
+                                        <!-- Most used language -->
+                                        <td id="language"></td>
+                                    </tr>
+                                </table>
+                             </td>
+                        </tr>
+                        <tr>
+                            <!-- Bio -->
+                            <td id="profileBio" style="max-width: 200px;"></td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <!-- right table: input and submit button -->
+                    <table class="username">
+                        <tr>
+                            <!-- text box -->
+                            <!-- we set margin-top to make it closer to the button -->
+                            <td style="text-align: center;">
+                                <input type="text" id="user" placeholder="Username" style="margin-top: 80px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <!-- button -->
+                            <!-- we set margin-bottom to make it closer to the text box -->
+                            <td style="text-align: center;">
+                                <button type="submit" id="submit" onclick="getUserData()" style="margin-bottom: 80px;">
+                                    SUBMIT
+                                </button>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <!-- In this part, we define styles -->
+        <style type="text/css">
+            /* In this css part I set a fixed image for background
+            if the screen is small, the image is fitted in best way
+            background image cover the entire background of website
+            I also set center as location of background image */
+            body{
+                background-image: url("background.jpg");
+                min-height: 100%;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                background-position: center;
+                background-size: cover;
+            }
+            /* set the main table that contains tables left and right at the center of the screen */
+            .main{
+                margin-left: auto;
+                margin-right: auto;
+                border-spacing: 45px;
+            }
+            /* transparent background(blur like) and make the table shape rectangle and set the location for the information table*/
+            /* we set the table at the left part of the screen */
+            /* set size and font size */
+            .info{
+            padding:50px;
+            width: 600px;
+            height: 400px;
+            border:2px solid rgb(0, 0, 0); 
+            color: white;
+            font-size:x-large;
+            position: absolute;
+            top: 50%;
+            left: 30%;
+            transform: translate(-50%, -50%);
+            border-radius: 25px;
+            border-collapse: separate;
+            border-spacing: 10px;
+            background: rgba(255, 255, 255, 0);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 1);
+            }
+            /* transparent background(blur like) and make the table shape rectangle and set the location for the right table*/
+            /* we set the table at the right part of the screen */
+            /* set size and font size */
+            .username{
+            padding:50px;
+            width: fit-content;
+            height: 400px;
+            border:2px solid rgb(0, 0, 0); 
+            font-size:x-large;
+            position: absolute;
+            top: 50%;
+            left: 70%;
+            transform: translate(-50%, -50%);
+            border-radius: 25px;
+            border-collapse: separate;
+            border-spacing: 1px;
+            background: rgba(255, 255, 255, 0);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 1);
+            }
+            /* add margin for the submit button*/
+            #submit{
+                margin-top: 16px;
+            }
+            /* round the corner of the image and set a fixed size for it*/
+            img{
+                width: 200px;
+                height: 200px;
+                border-radius: 20%;
+            }
+            /* set text size for cells */
+            /* align the text of the cells */
+            td{
+                font-size: 20px;
+                text-align: center;
+            }
+            /* make the input more beautiful */
+            /* set border only for bottom and change the text color and size*/
+            input{
+                border: 0px solid white;
+                height: 20px;
+                border-bottom: 3px solid white;
+                background: transparent;
+                color: white;
+                font-size: 14px;
+
+            }
+            /* change the color of the place holder for text box*/
+            ::placeholder{
+                color: white;
+            }
+            /* make the button more beautiful */
+            /* make the borders round and change the background color of the button and text color */
+            button{
+                border: 1px solid white;
+                border-radius: 9px;
+                width: 100px;
+                background-color: white;
+                color: black;
+                font-size: 14px;
+            }
+        </style>
+
+        <script type="text/javascript">
+            // clear the saved data in local storage
+            localStorage.clear()
+            // get the data from GitHub API and update the table
+            async function getUserData(){
+                // get the username from the text box
+                var enteredName=document.getElementById("user").value
+                // check if the user is online
+                if(navigator.onLine) {
+                    // check if the user is not in the local storage
+                    if (localStorage.getItem(enteredName) == null){
+                        var str="https://api.github.com/users/"+enteredName
+                        var response=await fetch(str) 
+                        var data=await response.json();
+
+                        console.log(response.status)
+
+                        // failed to fetch data from GitHub API
+                        if (response.status != 200 && response.status != 404){
+                            document.getElementById("profileImage").src="GitHub-Mark.png";
+                            document.getElementById("profileBio").innerHTML="Failed to send and receive data from GitHub"
+                            document.getElementById("profileBio").style.color="red";
+                            document.getElementById("profileName").innerHTML="";
+                            document.getElementById("profileBlog").innerHTML="";
+                            document.getElementById("profileLocation").innerHTML="";
+                            document.getElementById("language").innerHTML="";
+                        }else{
+                            // User found!
+                            // parse the data
+                            var parsed_data=JSON.parse(JSON.stringify(data))
+                            var avatar_url=parsed_data.avatar_url
+                            var login=parsed_data.login
+                            var name=parsed_data.name
+                            // save the data in local storage
+                            localStorage.setItem(enteredName, JSON.stringify(parsed_data));
+                            console.log("new")
+                        }
+                    }else{
+                        // get the data from local storage
+                        var parsed_data=JSON.parse(localStorage.getItem(enteredName));
+                        var avatar_url=parsed_data.avatar_url
+                        var login=parsed_data.login
+                        var name=parsed_data.name
+                        console.log("old")
+                    }
+                    // set ... if name, blog, bio, and location is null
+                    if (name == null){
+                        name="name: ..."
+                    }
+                    let blog=parsed_data.blog
+                    if (blog == null){
+                        blog="Blog: ..."
+                    }
+                    let location=parsed_data.location
+                    if (location == null){
+                        location="Location: ..."
+                    }
+
+                    let bio=parsed_data.bio
+                    // replace the \n with <br> 
+                    if (bio != null){
+                        bio = bio.replace(/(?:\r\n|\r|\n)/g, "<br>");
+                    }
+                    // set ... if bio is null
+                    if (bio == null){
+                        bio = "Bio: ..."
+                    }
+                    // Update table for User not found situation
+                    if(parsed_data.message=="Not Found"){
+                        document.getElementById("profileBio").innerHTML="Invalid Username!"
+                        document.getElementById("profileBio").style.color="red";
+                        document.getElementById("profileImage").src="GitHub-Mark.png";
+                        document.getElementById("profileName").innerHTML="";
+                        document.getElementById("profileBlog").innerHTML="";
+                        document.getElementById("profileLocation").innerHTML="";
+                        document.getElementById("language").innerHTML="";
+                    }
+                    else{
+                        // Update table for User found situation
+                        document.getElementById("profileBio").style.color="white";
+                        document.getElementById("profileImage").src=avatar_url;
+                        document.getElementById("profileName").innerHTML=name;
+                        document.getElementById("profileBlog").innerHTML=blog;
+                        document.getElementById("profileLocation").innerHTML=location;
+                        document.getElementById("profileBio").innerHTML=bio;
+
+                        // get the most used language
+                        var languages = []
+                        var max = -99999;
+                        var language = '';
+                        var res = await fetch("https://api.github.com/users/"+enteredName+"/repos?per_page=5&sort=pushed")
+                        var repositories = await res.json()
+                        // get the languages for each repository
+                        for (let i = 0; i < repositories.length; i++) { 
+                            var langs = await fetch(repositories[i].languages_url)
+                            var lang = await langs.json()
+                            languages.push(lang);
+                        }
+                        // find the language with the maximum score
+                        for (let j = 0; j < languages.length; j++) {
+                            for (var lang in languages[j]) {
+                                if (languages[j][lang] > max) {
+                                    max = languages[j][lang];
+                                    language = lang;
+                                }
+                            }
+                        }
+                        // set ... if language is null
+                        if (language == ''){
+                            language = 'Language: ...';
+                        }
+                        // update the table
+                        document.getElementById("language").innerHTML = language;
+                    }
+                }else{
+                    // Update table for Network connection is not available situation
+                    document.getElementById("profileImage").src="GitHub-Mark.png";
+                    document.getElementById("profileBio").innerHTML="Network connection is not available!"
+                    document.getElementById("profileBio").style.color="red";
+                    document.getElementById("profileName").innerHTML="";
+                    document.getElementById("profileBlog").innerHTML="";
+                    document.getElementById("profileLocation").innerHTML="";
+                    document.getElementById("language").innerHTML="";
+                }
+            }
+        </script>
+    </body>
+</html>
